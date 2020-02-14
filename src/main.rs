@@ -16,7 +16,8 @@ fn main() -> Result<(), Error> {
             "name": "test",
             "fields": [
                 {"name": "a", "type": "long", "default": 42},
-                {"name": "b", "type": "string"}
+                {"name": "b", "type": "string"},
+                {"name": "c", "type": ["null", "string"]}
             ]
         }
     "#;
@@ -27,11 +28,11 @@ fn main() -> Result<(), Error> {
 
     let mut writer = Writer::with_codec(&schema, Vec::new(), Codec::Deflate);
 
-    let mut record = Record::new(writer.schema()).unwrap();
-    record.put("a", 27i64);
-    record.put("b", "foo");
+    // let mut record = Record::new(writer.schema()).unwrap();
+    // record.put("a", 27i64);
+    // record.put("b", "foo");
 
-    writer.append(record)?;
+    // writer.append(record)?;
 
     let test = Test {
         a: 27,
