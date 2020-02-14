@@ -6,6 +6,7 @@ use serde::{Serialize, Deserialize};
 struct Test {
     a: i64,
     b: String,
+    c: Option<String>,
 }
 
 fn main() -> Result<(), Error> {
@@ -35,6 +36,7 @@ fn main() -> Result<(), Error> {
     let test = Test {
         a: 27,
         b: "foo".to_owned(),
+        c: None,
     };
 
     writer.append_ser(test)?;
