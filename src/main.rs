@@ -31,8 +31,6 @@ fn main() -> Result<(), Error> {
 
     let schema = Schema::parse_str(raw_schema)?;
 
-    println!("==============");
-    println!("{:?}", schema);
 
     let mut writer = Writer::with_codec(&schema, Vec::new(), Codec::Deflate);
 
