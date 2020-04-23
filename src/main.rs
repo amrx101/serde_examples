@@ -42,6 +42,7 @@ fn main() -> Result<(), Error> {
     writer.flush()?;
 
     let input = writer.into_inner();
+    println!("input is {:?}", input);
     let reader = Reader::with_schema(&schema, &input[..])?;
 
     for record in reader {
