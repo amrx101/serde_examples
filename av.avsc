@@ -2,7 +2,7 @@
     "type": "record",
     "name": "test",
     "fields": [
-        {"name": "a", "type": "long", "default": 42},
+        {"name": "a", "type": "string"},
         {"name": "b", "type": "string"},
         {"name": "c", "type": ["null", "string"]}
     ]
