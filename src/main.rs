@@ -22,8 +22,6 @@ fn main() -> Result<(), Error> {
 
     let schema = Schema::parse_str(raw_schema)?;
 
-    println!("{:?}", schema);
-
     let mut writer = Writer::with_codec(&schema, Vec::new(), Codec::Deflate);
 
     let mut record = Record::new(writer.schema()).unwrap();
@@ -32,12 +30,13 @@ fn main() -> Result<(), Error> {
 
     writer.append(record)?;
 
-    let test = Test {
-        a: 27,
-        b: "foo".to_owned(),
-    };
 
-    writer.append_ser(test)?;
+    // let test = Test {
+    //     a: 27,
+    //     b: "foo".to_owned(),
+    // };
+
+    // writer.append_ser(test)?;
 
     writer.flush()?;
 
