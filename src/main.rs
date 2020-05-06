@@ -10,6 +10,7 @@ struct Test {
     a: Option<String>,
     b: Option<String>,
     c: Option<String>,
+    d: Option<f64>,
 }
 
 fn main() -> Result<(), Error> {

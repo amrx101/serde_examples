@@ -4,6 +4,7 @@
     "fields": [
         {"name": "a", "type": ["null", "string"], "default": "null"},
             {"name": "b", "type": ["null", "string"], "default": "null"},
-            {"name": "c",  "type": ["null", "string"], "default": "null"}
+            {"name": "c",  "type": ["null", "string"], "default": "null"},
+            {"name": "d", "type": ["null", "float"], "default": "null"}
     ]
 }
