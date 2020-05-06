@@ -2,8 +2,8 @@
     "type": "record",
     "name": "test",
     "fields": [
-        {"name": "a", "type": "string"},
-        {"name": "b", "type": "string"},
-        {"name": "c", "type": ["null", "string"]}
+        {"name": "a", "type": ["null", "string"], "default": "null"},
+            {"name": "b", "type": ["null", "string"], "default": "null"},
+            {"name": "c",  "type": ["null", "string"], "default": "null"}
     ]
 }

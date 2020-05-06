@@ -1,7 +1,8 @@
 use avro_rs::{Codec, Reader, Schema, Writer, from_value, types::Record};
 use failure::Error;
 use serde::{Serialize, Deserialize};
-use std::fs;
+use std::fs::File;
+use std::io::prelude::*;
 use std::collections::BTreeMap;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -17,19 +18,10 @@ fn main() -> Result<(), Error> {
     //     expect("No Rad");
     // println!("contents are {:?}", contents);
 
-    let raw_schema = r#"
-        {
-            "type": "record",
-            "name": "test",
-            "fields": [
-                {"name": "a", "type": ["null", "string"], "default": "null"},
-                {"name": "b", "type": ["null", "string"], "default": "null"},
-                {"name": "c",  "type": ["null", "string"], "default": "null"}
-            ]
-        }
-    "#;
-
-    let schema = Schema::parse_str(raw_schema)?;
+    let mut file = File::open("/home/amit/rust_samples/avr_ser/av.avsc")?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+    let schema = Schema::parse_str(&contents)?;
 
 
     let mut writer = Writer::with_codec(&schema, Vec::new(), Codec::Deflate);
