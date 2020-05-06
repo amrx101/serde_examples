@@ -1,6 +1,8 @@
 use avro_rs::{Codec, Reader, Schema, Writer, from_value, types::Record};
 use failure::Error;
 use serde::{Serialize, Deserialize};
+use std::fs::File;
+use std::io::prelude::*;
 
 #[derive(Debug, Deserialize, Serialize)]
 struct Test {
@@ -10,19 +12,23 @@ struct Test {
 }
 
 fn main() -> Result<(), Error> {
-    let raw_schema = r#"
-        {
-            "type": "record",
-            "name": "test",
-            "fields": [
-                {"name": "a", "type": "long", "default": 42},
-                {"name": "b", "type": "string"},
-                {"name": "c", "type": ["null", "string"]}
-            ]
-        }
-    "#;
+    // let raw_schema = r#"
+    //     {
+    //         "type": "record",
+    //         "name": "test",
+    //         "fields": [
+    //             {"name": "a", "type": "long", "default": 42},
+    //             {"name": "b", "type": "string"},
+    //             {"name": "c", "type": ["null", "string"]}
+    //         ]
+    //     }
+    // "#;
 
-    let schema = Schema::parse_str(raw_schema)?;
+    let mut file = File::open("/home/amit/rust_samples/avr_ser/av.avsc")?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+
+    let schema = Schema::parse_str(&contents)?;
 
     println!("{:?}", schema);
 
