@@ -18,7 +18,7 @@ pub struct G2Data {
     value: Option<String>,
     #[serde(default)]
     key: Option<String>,
-    #[serde(default)]
+    #[serde(default, deserialize_with="from_str_optional")]
     timestamp: Option<i32>,
     #[serde(default)]
     start_timestamp: Option<String>,
@@ -46,23 +46,22 @@ pub struct G2Data {
     motor_version: Option<String>,
     #[serde(default)]
     system_boot_time: Option<String>,
-    #[serde(default)]
+    #[serde(default, deserialize_with="from_str_optional")]
     mode: Option<i32>,
-    #[serde(default)]
     error_code: Option<String>,
-    #[serde(default)]
+    #[serde(default, deserialize_with="from_str_optional")]
     is_valid: Option<i32>,
     #[serde(default, deserialize_with="from_str_optional")]
     ACC_X_MPS2: Option<f64>,
-    #[serde(default)]
+    #[serde(default, deserialize_with="from_str_optional")]
     ACC_Y_MPS2: Option<f64>,
-    #[serde(default)]
+    #[serde(default, deserialize_with="from_str_optional")]
     ACC_Z_MPS2: Option<f64>,
-    #[serde(default)]
+    #[serde(default, deserialize_with="from_str_optional")]
     GYR_X_DEG: Option<f64>,
-    #[serde(default)]
+    #[serde(default, deserialize_with="from_str_optional")]
     GYR_Y_DEG: Option<f64>,
-    #[serde(default)]
+    #[serde(default, deserialize_with="from_str_optional")]
     GYR_Z_DEG: Option<f64>,
 }
 
@@ -76,7 +75,6 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
         Ok(Value::String(s)) => T::from_str(&s).map_err(serde::de::Error::custom).map(Option::from),
         Ok(v) => {
             println!("string expected but found something else: {}", v);
-            let tt = Some(v);
             return Ok(None);
         },
         Err(_) => Ok(None)
