@@ -51,6 +51,7 @@ pub struct G2Data {
     error_code: Option<String>,
     #[serde(default, deserialize_with="from_str_optional")]
     is_valid: Option<i32>,
+    #[serde(rename = "manifest-version")]
     #[serde(default, deserialize_with="from_str_optional")]
     ACC_X_MPS2: Option<f64>,
     #[serde(default, deserialize_with="from_str_optional")]
@@ -62,7 +63,7 @@ pub struct G2Data {
     #[serde(default, deserialize_with="from_str_optional")]
     GYR_Y_DEG: Option<f64>,
     #[serde(default, deserialize_with="from_str_optional")]
-    GYR_Z_DEG: Option<f64>,
+    GYR_Z_DEG: Option<f64>
 }
 
 fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
@@ -101,7 +102,8 @@ fn main() {
         {
 
             "mender_artifact_ver": "11",
-            "ACC_X_MPS2": "99.6"
+            "ACC_X_MPS2": "99.6",
+            "value": "wkkw"
         }"#;
     let v: G2Data = serde_json::from_str(data).unwrap();
     println!("v is {:?}", v);
