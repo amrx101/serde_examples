@@ -8,7 +8,7 @@ use std::io::prelude::*;
 struct Test {
     a: i64,
     b: String,
-    c: Option<String>,
+    x_c: Option<String>,
 }
 
 fn main() -> Result<(), Error> {
@@ -43,7 +43,7 @@ fn main() -> Result<(), Error> {
     let test = Test {
         a: 27,
         b: "foo".to_owned(),
-        c: None,
+        x_c: None,
     };
 
     writer.append_ser(test)?;
