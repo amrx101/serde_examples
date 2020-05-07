@@ -70,6 +70,7 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
           T::Err: Display,
           D: serde::Deserializer<'de>
 {
+    // println!("{:?}", deserializer);
     let deser_res: Result<Value, _> = serde::Deserialize::deserialize(deserializer);
     match deser_res {
         Ok(Value::String(s)) => T::from_str(&s).map_err(serde::de::Error::custom).map(Option::from),
@@ -81,6 +82,14 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
     }
 }
 
+// fn from_str_long<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
+// where T: FromStr,
+//       T::Err: Display,
+//       D: serde::Deserializer<'de>
+// {
+    
+// }
+
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=use%20serde%3A%3ADeserialize%3B%0Ause%20serde_json%3A%3Ajson%3B%0Ause%20std%3A%3Acollections%3A%3ABTreeMap%3B%0A%0A%23%5Bderive(Deserialize%2C%20Debug)%5D%0Astruct%20User%20%7B%0A%20%20%20%20fingerprint%3A%20Option%3CString%3E%2C%0A%20%20%20%20location%3A%20String%2C%0A%7D%0A%0Afn%20main()%20%7B%0A%20%20%20%20let%20mut%20m%3A%20BTreeMap%3CString%2C%20String%3E%20%3D%20BTreeMap%3A%3Anew()%3B%0A%20%20%20%20m.insert(%22fingerprint%22.to_owned()%2C%20%22aa%22.to_owned())%3B%0A%20%20%20%20m.insert(%22location%22.to_owned()%2C%20%22aa%22.to_owned())%3B%0A%20%20%20%20%2F%2F%20The%20type%20of%20%60j%60%20is%20%60serde_json%3A%3AValue%60%0A%20%20%20%20let%20j%20%3D%20json!(%7B%0A%20%20%20%20%20%20%20%20%2F%2F%20%22fingerprint%22%3A%20%220xF9BA143B95FF6D82%22%2C%0A%20%20%20%20%20%20%20%20%22location%22%3A%20%22Menlo%20Park%2C%20CA%22%0A%20%20%20%20%7D)%3B%0A%20%20%20%20%0A%20%20%20%20let%20d%20%3D%20json!(m)%3B%0A%0A%20%20%20%20let%20u%3A%20User%20%3D%20serde_json%3A%3Afrom_value(j).unwrap()%3B%0A%20%20%20%20println!(%22%7B%3A%23%3F%7D%22%2C%20u)%3B%0A%20%20%20%20let%20du%3A%20User%20%3D%20serde_json%3A%3Afrom_value(d).unwrap()%3B%0A%20%20%20%20println!(%22%7B%3A%23%3F%7D%22%2C%20du)%3B%0A%7D
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=f265edc1b9e5fd4485a83da40fd01785
 
@@ -90,6 +99,7 @@ fn main() {
     // can_raw
     let data = r#"
         {
+
             "mender_artifact_ver": "11",
             "ACC_X_MPS2": "99.6"
         }"#;
