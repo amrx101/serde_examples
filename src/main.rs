@@ -51,7 +51,7 @@ pub struct G2Data {
     error_code: Option<String>,
     #[serde(default, deserialize_with="from_str_optional")]
     is_valid: Option<i32>,
-    #[serde(rename = "manifest-version")]
+    #[serde(rename(deserialize = "ACC_X_MPS2", serialize = "new"))]
     #[serde(default, deserialize_with="from_str_optional")]
     ACC_X_MPS2: Option<f64>,
     #[serde(default, deserialize_with="from_str_optional")]
@@ -65,6 +65,19 @@ pub struct G2Data {
     #[serde(default, deserialize_with="from_str_optional")]
     GYR_Z_DEG: Option<f64>
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Joeybloggs {
+    pp: Option<String>,
+    #[serde(rename(deserialize = "ACC_X_MPS2", serialize = "new"))]
+    #[serde(default, deserialize_with="from_str_optional")]
+    field: Option<f64>,
+}
+
+// fn main() {
+//     let j = serde_json::from_str::<Joeybloggs>("{\"old\":0}").unwrap();
+//     println!("{}", serde_json::to_string(&j).unwrap());
+// }
 
 fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
     where T: FromStr,
@@ -102,10 +115,17 @@ fn main() {
         {
 
             "mender_artifact_ver": "11",
-            "ACC_X_MPS2": "99.6",
-            "value": "wkkw"
+            "ACC_X_MPS2": "99.6"
+
         }"#;
     let v: G2Data = serde_json::from_str(data).unwrap();
     println!("v is {:?}", v);
+    let dd = serde_json::from_str::<G2Data>("{\"ACC_X_MPS2\":\"0\"}").unwrap();
+    println!("dd is {:?}", dd);
+
+    let j = serde_json::from_str::<Joeybloggs>("{\"ACC_X_MPS2\":\"0\"}").unwrap();
+    println!("{:?}", j);
+    println!("{}", serde_json::to_string(&j).unwrap());
+    // let tt: Joeybloggs = serde_json::from_str(&j).unwrap();
 
 }
