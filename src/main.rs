@@ -15,6 +15,8 @@ pub struct G2Data {
     #[serde(default, deserialize_with="from_str_optional")]
     can_id: Option<i32>,
     #[serde(default)]
+    data: Option<String>,
+    #[serde(default)]
     value: Option<String>,
     #[serde(default)]
     key: Option<String>,
@@ -48,22 +50,22 @@ pub struct G2Data {
     system_boot_time: Option<String>,
     #[serde(default, deserialize_with="from_str_optional")]
     mode: Option<i32>,
+    #[serde(default)]
     error_code: Option<String>,
     #[serde(default, deserialize_with="from_str_optional")]
     is_valid: Option<i32>,
-    #[serde(rename = "manifest-version")]
-    #[serde(default, deserialize_with="from_str_optional")]
-    ACC_X_MPS2: Option<f64>,
-    #[serde(default, deserialize_with="from_str_optional")]
-    ACC_Y_MPS2: Option<f64>,
-    #[serde(default, deserialize_with="from_str_optional")]
-    ACC_Z_MPS2: Option<f64>,
-    #[serde(default, deserialize_with="from_str_optional")]
-    GYR_X_DEG: Option<f64>,
-    #[serde(default, deserialize_with="from_str_optional")]
-    GYR_Y_DEG: Option<f64>,
-    #[serde(default, deserialize_with="from_str_optional")]
-    GYR_Z_DEG: Option<f64>
+    // #[serde(default, deserialize_with="from_str_optional")]
+    // ACC_X_MPS2: Option<f64>,
+    // #[serde(default, deserialize_with="from_str_optional")]
+    // ACC_Y_MPS2: Option<f64>,
+    // #[serde(default, deserialize_with="from_str_optional")]
+    // ACC_Z_MPS2: Option<f64>,
+    // #[serde(default, deserialize_with="from_str_optional")]
+    // GYR_X_DEG: Option<f64>,
+    // #[serde(default, deserialize_with="from_str_optional")]
+    // GYR_Y_DEG: Option<f64>,
+    // #[serde(default, deserialize_with="from_str_optional")]
+    // GYR_Z_DEG: Option<f64>
 }
 
 fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
@@ -98,6 +100,41 @@ fn main() {
             "value": "wkkw"
         }"#;
     let v: G2Data = serde_json::from_str(data).unwrap();
+    let v2: G2Data = serde_json::from_str(data).unwrap();
     println!("v is {:?}", v);
+
+    let mut file = File::open("/home/amit/rust_samples/avr_ser/cc.avsc").unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+
+
+    let raw_schema_r = r#"
+    {
+        "type": "record",
+        "name": "test",
+        "fields": [
+            {"name": "mender_artifact_ver", "type": "string"},
+            {"name": "ACC_X_MPS2", "type": "string"},
+            {"name": "value",  "type": ["null", "string"], "default": "null"}
+        ]
+    }"#;
+    let schema = Schema::parse_str(&contents).unwrap();
+    // println!("{:?}", schema.canonical_form());
+
+
+    let mut codec_writer = Writer::with_codec(&schema, Vec::new(), Codec::Deflate);
+    let mut writer = Writer::new(&schema, Vec::new());
+    writer.append_ser(v).unwrap();
+    writer.flush().unwrap();
+    let encoded = writer.into_inner();
+    // println!("encoded is {:?}", encoded);
+    let len_e: usize = encoded.len();
+    println!("len without compression={:?}", len_e);
+
+    codec_writer.append_ser(v2).unwrap();
+    codec_writer.flush().unwrap();
+    let ec = codec_writer.into_inner();
+    let l_e = ec.len();
+    println!("len with compression={:?}", l_e);
 
 }
