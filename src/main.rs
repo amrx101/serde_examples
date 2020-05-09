@@ -92,6 +92,11 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
 fn main() {
     println!("Hello world");
     // can_raw
+    let mut file = File::open("/home/amit/rust_samples/avr_ser/cc.avsc").unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+    let schema = Schema::parse_str(&contents).unwrap();
+    let mut codec_writer = Writer::with_codec(&schema, Vec::new(), Codec::Deflate);
     let data = r#"
         {
 
@@ -99,13 +104,16 @@ fn main() {
             "ACC_X_MPS2": "99.6",
             "value": "wkkw"
         }"#;
-    let v: G2Data = serde_json::from_str(data).unwrap();
-    let v2: G2Data = serde_json::from_str(data).unwrap();
-    println!("v is {:?}", v);
 
-    let mut file = File::open("/home/amit/rust_samples/avr_ser/cc.avsc").unwrap();
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
+    for n in 1..10000 {
+        let v: G2Data = serde_json::from_str(data).unwrap();
+        codec_writer.append_ser(v).unwrap();
+    }
+    codec_writer.flush().unwrap();
+    
+    // let v2: G2Data = serde_json::from_str(data).unwrap();
+
+   
 
 
     let raw_schema_r = r#"
@@ -118,21 +126,21 @@ fn main() {
             {"name": "value",  "type": ["null", "string"], "default": "null"}
         ]
     }"#;
-    let schema = Schema::parse_str(&contents).unwrap();
+    
     // println!("{:?}", schema.canonical_form());
 
 
-    let mut codec_writer = Writer::with_codec(&schema, Vec::new(), Codec::Deflate);
-    let mut writer = Writer::new(&schema, Vec::new());
-    writer.append_ser(v).unwrap();
-    writer.flush().unwrap();
-    let encoded = writer.into_inner();
-    // println!("encoded is {:?}", encoded);
-    let len_e: usize = encoded.len();
-    println!("len without compression={:?}", len_e);
+    
+    // let mut writer = Writer::new(&schema, Vec::new());
+    // writer.append_ser(v).unwrap();
+    // writer.flush().unwrap();
+    // let encoded = writer.into_inner();
+    // // println!("encoded is {:?}", encoded);
+    // let len_e: usize = encoded.len();
+    // println!("len without compression={:?}", len_e);
 
-    codec_writer.append_ser(v2).unwrap();
-    codec_writer.flush().unwrap();
+    // codec_writer.append_ser(v2).unwrap();
+    // codec_writer.flush().unwrap();
     let ec = codec_writer.into_inner();
     let l_e = ec.len();
     println!("len with compression={:?}", l_e);
