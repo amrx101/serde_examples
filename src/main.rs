@@ -50,22 +50,22 @@ pub struct G2Data {
     #[serde(default, deserialize_with="from_str_optional")]
     mode: Option<i32>,
     #[serde(default, deserialize_with="from_str_optional")]
-    ttff_s: Option<f64>,
+    ttff_s: Option<f32>,
     error_code: Option<String>,
     #[serde(default, deserialize_with="from_str_optional")]
     is_valid: Option<i32>,
     #[serde(default, deserialize_with="from_str_optional")]
-    ACC_X_MPS2: Option<f64>,
+    ACC_X_MPS2: Option<f32>,
     #[serde(default, deserialize_with="from_str_optional")]
-    ACC_Y_MPS2: Option<f64>,
+    ACC_Y_MPS2: Option<f32>,
     #[serde(default, deserialize_with="from_str_optional")]
-    ACC_Z_MPS2: Option<f64>,
+    ACC_Z_MPS2: Option<f32>,
     #[serde(default, deserialize_with="from_str_optional")]
-    GYR_X_DEG: Option<f64>,
+    GYR_X_DEG: Option<f32>,
     #[serde(default, deserialize_with="from_str_optional")]
-    GYR_Y_DEG: Option<f64>,
+    GYR_Y_DEG: Option<f32>,
     #[serde(default, deserialize_with="from_str_optional")]
-    GYR_Z_DEG: Option<f64>,
+    GYR_Z_DEG: Option<f32>,
 
 }
 
