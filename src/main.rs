@@ -38,6 +38,8 @@ pub struct G2Data {
     #[serde(default)]
     sim_cimi: Option<String>,
     #[serde(default)]
+    mender_artifact_ver: Option<String>,
+    #[serde(default)]
     mcu_version: Option<String>,
     #[serde(default)]
     vin: Option<String>,
