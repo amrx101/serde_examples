@@ -24,11 +24,11 @@
         {"name": "mode", "type": ["null","int"], "default": "null"},
         {"name": "error_code", "type": ["null", "string"], "default": "null"},
         {"name": "is_valid", "type": ["null","int"],  "default": "null"},
-        {"name": "ACC_X_MPS2", "type": ["null", "double"], "default": "null"},
-        {"name": "ACC_Y_MPS2", "type": ["null", "double"], "default": "null"},
-        {"name": "ACC_Z_MPS2", "type": ["null", "double"], "default": "null"},
-        {"name": "GYR_X_DEG", "type": ["null", "double"], "default": "null"},
-        {"name": "GYR_Y_DEG", "type": ["null", "double"], "default": "null"},
-        {"name": "GYR_Z_DEG", "type": ["null", "double"], "default": "null"}
+        {"name": "ACC_X_MPS2", "type": ["null", "float"], "default": "null"},
+        {"name": "ACC_Y_MPS2", "type": ["null", "float"], "default": "null"},
+        {"name": "ACC_Z_MPS2", "type": ["null", "float"], "default": "null"},
+        {"name": "GYR_X_DEG", "type": ["null", "float"], "default": "null"},
+        {"name": "GYR_Y_DEG", "type": ["null", "float"], "default": "null"},
+        {"name": "GYR_Z_DEG", "type": ["null", "float"], "default": "null"}
 	]
 }
