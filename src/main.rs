@@ -51,13 +51,25 @@ pub struct G2Data {
     system_boot_time: Option<String>,
     #[serde(default, deserialize_with="from_str_optional")]
     mode: Option<i32>,
-    #[serde(default)]
+    #[serde(default, deserialize_with="from_str_optional")]
+    ttff_s: Option<f64>,
     error_code: Option<String>,
     #[serde(default, deserialize_with="from_str_optional")]
     is_valid: Option<i32>,
     #[serde(default, deserialize_with="from_str_optional")]
     ACC_X_MPS2: Option<f64>,
+    #[serde(default, deserialize_with="from_str_optional")]
+    ACC_Y_MPS2: Option<f64>,
+    #[serde(default, deserialize_with="from_str_optional")]
+    ACC_Z_MPS2: Option<f64>,
+    #[serde(default, deserialize_with="from_str_optional")]
+    GYR_X_DEG: Option<f64>,
+    #[serde(default, deserialize_with="from_str_optional")]
+    GYR_Y_DEG: Option<f64>,
+    #[serde(default, deserialize_with="from_str_optional")]
+    GYR_Z_DEG: Option<f64>
 }
+
 
 fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
     where T: FromStr,
@@ -83,10 +95,11 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
 fn main() {
     println!("Hello world");
     // can_raw
-    let mut file = File::open("/home/amit/rust_samples/avr_ser/cc.avsc").unwrap();
+    let mut file = File::open("/home/amit/rust_samples/avr_ser/ge2.avsc").unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     let schema = Schema::parse_str(&contents).unwrap();
+    // println!("SCHEMA={:?}", schema.);
     let mut codec_writer = Writer::with_codec(&schema, Vec::new(), Codec::Deflate);
     let data = r#"
         {
