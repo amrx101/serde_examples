@@ -7,6 +7,7 @@ use std::collections::{HashMap, BTreeMap};
 use serde_json::Value;
 use std::fmt::Display;
 use std::str::FromStr;
+use std::time::Instant;
 
 use serde::de::{self, Deserializer};
 
@@ -54,18 +55,6 @@ pub struct G2Data {
     error_code: Option<String>,
     #[serde(default, deserialize_with="from_str_optional")]
     is_valid: Option<i32>,
-    // #[serde(default, deserialize_with="from_str_optional")]
-    // ACC_X_MPS2: Option<f64>,
-    // #[serde(default, deserialize_with="from_str_optional")]
-    // ACC_Y_MPS2: Option<f64>,
-    // #[serde(default, deserialize_with="from_str_optional")]
-    // ACC_Z_MPS2: Option<f64>,
-    // #[serde(default, deserialize_with="from_str_optional")]
-    // GYR_X_DEG: Option<f64>,
-    // #[serde(default, deserialize_with="from_str_optional")]
-    // GYR_Y_DEG: Option<f64>,
-    // #[serde(default, deserialize_with="from_str_optional")]
-    // GYR_Z_DEG: Option<f64>
 }
 
 fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
@@ -105,42 +94,14 @@ fn main() {
             "value": "wkkw"
         }"#;
 
+    let now = Instant::now();
     for n in 1..10000 {
         let v: G2Data = serde_json::from_str(data).unwrap();
         codec_writer.append_ser(v).unwrap();
     }
     codec_writer.flush().unwrap();
-    
-    // let v2: G2Data = serde_json::from_str(data).unwrap();
-
-   
-
-
-    let raw_schema_r = r#"
-    {
-        "type": "record",
-        "name": "test",
-        "fields": [
-            {"name": "mender_artifact_ver", "type": "string"},
-            {"name": "ACC_X_MPS2", "type": "string"},
-            {"name": "value",  "type": ["null", "string"], "default": "null"}
-        ]
-    }"#;
-    
-    // println!("{:?}", schema.canonical_form());
-
-
-    
-    // let mut writer = Writer::new(&schema, Vec::new());
-    // writer.append_ser(v).unwrap();
-    // writer.flush().unwrap();
-    // let encoded = writer.into_inner();
-    // // println!("encoded is {:?}", encoded);
-    // let len_e: usize = encoded.len();
-    // println!("len without compression={:?}", len_e);
-
-    // codec_writer.append_ser(v2).unwrap();
-    // codec_writer.flush().unwrap();
+    let elasped = now.elapsed();
+    println!("EL{:?}", elasped);
     let ec = codec_writer.into_inner();
     let l_e = ec.len();
     println!("len with compression={:?}", l_e);

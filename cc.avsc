@@ -1,7 +1,7 @@
 {
 	"namespace": "atherenergy.vcu_cloud_connect",
     "type": "record",
-	"name": "gen2_common",
+	"name": "gen1_common",
 	"fields" : [
 		{"name": "can_id", "type": ["null", "int"], "default": "null"},
 		{"name": "data", "type": ["null", "string"], "default": "null"},
