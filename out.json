@@ -1,0 +1,202 @@
+{
+  "name": "atherenergy.vcu_cloud_connect.common",
+  "type": "record",
+  "fields": [
+    {
+      "name": "can_id",
+      "type": [
+        "null",
+        "int"
+      ]
+    },
+    {
+      "name": "data",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "value",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "key",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "timestamp",
+      "type": [
+        "null",
+        "double"
+      ]
+    },
+    {
+      "name": "start_timestamp",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "end_timestamp",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "release_name",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "bms_version",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "charger_version",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "sim_ccid",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "sim_cimi",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "mender_artifact_ver",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "mcu_version",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "vin",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "bike_type",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "motor_version",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "system_boot_time",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "mode",
+      "type": [
+        "null",
+        "int"
+      ]
+    },
+    {
+      "name": "ttff_s",
+      "type": [
+        "null",
+        "float"
+      ]
+    },
+    {
+      "name": "error_code",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "is_valid",
+      "type": [
+        "null",
+        "int"
+      ]
+    },
+    {
+      "name": "ACC_X_MPS2",
+      "type": [
+        "null",
+        "float"
+      ]
+    },
+    {
+      "name": "ACC_Y_MPS2",
+      "type": [
+        "null",
+        "float"
+      ]
+    },
+    {
+      "name": "ACC_Z_MPS2",
+      "type": [
+        "null",
+        "float"
+      ]
+    },
+    {
+      "name": "GYR_X_DEG",
+      "type": [
+        "null",
+        "float"
+      ]
+    },
+    {
+      "name": "GYR_Y_DEG",
+      "type": [
+        "null",
+        "float"
+      ]
+    },
+    {
+      "name": "GYR_Z_DEG",
+      "type": [
+        "null",
+        "float"
+      ]
+    }
+  ]
+}

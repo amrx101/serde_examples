@@ -38,8 +38,6 @@ pub struct G2Data {
     #[serde(default)]
     sim_cimi: Option<String>,
     #[serde(default)]
-    mender_artifact_ver: Option<String>,
-    #[serde(default)]
     mcu_version: Option<String>,
     #[serde(default)]
     vin: Option<String>,
@@ -67,7 +65,8 @@ pub struct G2Data {
     #[serde(default, deserialize_with="from_str_optional")]
     GYR_Y_DEG: Option<f64>,
     #[serde(default, deserialize_with="from_str_optional")]
-    GYR_Z_DEG: Option<f64>
+    GYR_Z_DEG: Option<f64>,
+
 }
 
 
@@ -99,7 +98,9 @@ fn main() {
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     let schema = Schema::parse_str(&contents).unwrap();
-    // println!("SCHEMA={:?}", schema.);
+    let vv = schema.canonical_form();
+    println!("{}", vv);
+    
     let mut codec_writer = Writer::with_codec(&schema, Vec::new(), Codec::Deflate);
     let data = r#"
         {
@@ -112,6 +113,7 @@ fn main() {
     let now = Instant::now();
     for n in 1..10000 {
         let v: G2Data = serde_json::from_str(data).unwrap();
+        println!("v==={:?}", v);
         codec_writer.append_ser(v).unwrap();
     }
     codec_writer.flush().unwrap();
