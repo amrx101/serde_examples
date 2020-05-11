@@ -23,6 +23,7 @@
         {"name": "system_boot_time", "type": ["null","string"], "default": "null"},
         {"name": "mode", "type": ["null","int"], "default": "null"},
         {"name": "error_code", "type": ["null", "string"], "default": "null"},
-        {"name": "is_valid", "type": ["null","int"],  "default": "null"}
+        {"name": "is_valid", "type": ["null","int"],  "default": "null"},
+        {"name": "ACC_X_MPS2", "type": ["null", "double"], "default": "null"}
 	]
 }

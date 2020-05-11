@@ -55,6 +55,8 @@ pub struct G2Data {
     error_code: Option<String>,
     #[serde(default, deserialize_with="from_str_optional")]
     is_valid: Option<i32>,
+    #[serde(default, deserialize_with="from_str_optional")]
+    ACC_X_MPS2: Option<f64>,
 }
 
 fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
