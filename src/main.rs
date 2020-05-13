@@ -196,14 +196,14 @@ fn tt() -> Result<Vec<u8>, MyError> {
     // codec_writer.flush().unwrap();
 
     let now = Instant::now();
-    // for n in 1..2 {
+    for n in 1..10 {
         let v: G2Data = serde_json::from_str(data).unwrap();
         // println!("v==={:?}", v);
         match codec_writer.append_ser(v) {
             Ok(f) => f,
             Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
         };
-    // }
+    }
     match codec_writer.flush() {
         Ok(v) => v,
         Err(e) => return Err(MyError::SerdeSerializer(e.to_string()),)
