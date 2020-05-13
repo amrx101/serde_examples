@@ -4,7 +4,7 @@ use serde::{Serialize, Deserialize};
 use std::fs::File;
 use std::io::prelude::*;
 use std::collections::{HashMap, BTreeMap};
-use serde_json::Value;
+use serde_json::{Value, json};
 use std::fmt::Display;
 use std::str::FromStr;
 use std::time::Instant;
@@ -122,6 +122,11 @@ fn tt() -> Result<Vec<u8>, MyError> {
             "ACC_X_MPS2": "99.6",
             "value": "wkkw"
         }"#;
+    let rr:BTreeMap<String, String> = serde_json::from_str(data).unwrap();
+    let j = json!(rr);
+    let vv: G2Data = serde_json::from_value(j).unwrap();
+    codec_writer.append_ser(vv).unwrap();
+    codec_writer.flush().unwrap();
 
     let now = Instant::now();
     for n in 1..10000 {
