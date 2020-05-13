@@ -11,6 +11,7 @@ use std::time::Instant;
 
 use serde::de::{self, Deserializer};
 
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct G2Data {
     #[serde(default, deserialize_with="from_str_optional")]
@@ -93,7 +94,9 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=f265edc1b9e5fd4485a83da40fd01785
 
 
-fn main() {
+
+
+fn tt() -> Vec<u8> {
     println!("Hello world");
     // can_raw
     let mut file = File::open("/home/amit/rust_samples/avr_ser/ge2.avsc").unwrap();
@@ -101,9 +104,11 @@ fn main() {
     file.read_to_string(&mut contents).unwrap();
     let schema = Schema::parse_str(&contents).unwrap();
     let vv = schema.canonical_form();
-    println!("{}", vv);
+    // println!("{}", vv);
+
+    let mut res: Vec<u8> = Vec::new();
     
-    let mut codec_writer = Writer::with_codec(&schema, Vec::new(), Codec::Deflate);
+    let mut codec_writer = Writer::with_codec(&schema, res, Codec::Deflate);
     let data = r#"
         {
 
@@ -115,7 +120,7 @@ fn main() {
     let now = Instant::now();
     for n in 1..10000 {
         let v: G2Data = serde_json::from_str(data).unwrap();
-        println!("v==={:?}", v);
+        // println!("v==={:?}", v);
         codec_writer.append_ser(v).unwrap();
     }
     codec_writer.flush().unwrap();
@@ -124,5 +129,13 @@ fn main() {
     let ec = codec_writer.into_inner();
     let l_e = ec.len();
     println!("len with compression={:?}", l_e);
+    // println!("{:?}", std::any::TypeId::of::<ec>());
+    // println!("{:?}", res.len());
+    ec
 
+}
+
+fn main(){
+    let dd = tt();
+    println!("{:?}", dd.len());
 }
