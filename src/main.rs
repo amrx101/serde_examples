@@ -75,6 +75,68 @@ pub struct G2Data {
     GYR_Y_DEG: Option<f32>,
     #[serde(default, deserialize_with="from_str_optional")]
     GYR_Z_DEG: Option<f32>,
+    same: f32,
+
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct G2DataRes {
+    #[serde(default)]
+    can_id: Option<i32>,
+    #[serde(default)]
+    data: Option<String>,
+    #[serde(default)]
+    value: Option<String>,
+    #[serde(default)]
+    key: Option<String>,
+    #[serde(default)]
+    timestamp: Option<i32>,
+    #[serde(default)]
+    start_timestamp: Option<String>,
+    #[serde(default)]
+    end_timestamp: Option<String>,
+    #[serde(default)]
+    release_name: Option<String>,
+    #[serde(default)]
+    bms_version: Option<String>,
+    #[serde(default)]
+    charger_version: Option<String>,
+    #[serde(default)]
+    sim_ccid: Option<String>,
+    #[serde(default)]
+    sim_cimi: Option<String>,
+    #[serde(default)]
+    mender_artifact_ver: Option<String>,
+    #[serde(default)]
+    mcu_version: Option<String>,
+    #[serde(default)]
+    vin: Option<String>,
+    #[serde(default)]
+    bike_type: Option<String>,
+    #[serde(default)]
+    motor_version: Option<String>,
+    #[serde(default)]
+    system_boot_time: Option<String>,
+    #[serde(default)]
+    mode: Option<i32>,
+    #[serde(default)]
+    ttff_s: Option<f32>,
+    error_code: Option<String>,
+    #[serde(default)]
+    is_valid: Option<i32>,
+    #[serde(default)]
+    ACC_X_MPS2: Option<f32>,
+    #[serde(default)]
+    ACC_Y_MPS2: Option<f32>,
+    #[serde(default)]
+    ACC_Z_MPS2: Option<f32>,
+    #[serde(default)]
+    GYR_X_DEG: Option<f32>,
+    #[serde(default)]
+    GYR_Y_DEG: Option<f32>,
+    #[serde(default)]
+    GYR_Z_DEG: Option<f32>,
+    same: f32,
 
 }
 
@@ -86,10 +148,12 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
 {
     // println!("{:?}", deserializer);
     let deser_res: Result<Value, _> = serde::Deserialize::deserialize(deserializer);
+    println!("{:?}", deser_res);
     match deser_res {
         Ok(Value::String(s)) => T::from_str(&s).map_err(serde::de::Error::custom).map(Option::from),
         Ok(v) => {
-            println!("string expected but found something else: {}", v);
+            println!("strssssing expected but found something else: {}", v);
+            // return Ok(Value::Number(s));
             return Ok(None);
         },
         Err(_) => Ok(None)
@@ -120,28 +184,30 @@ fn tt() -> Result<Vec<u8>, MyError> {
 
             "mender_artifact_ver": "11",
             "ACC_X_MPS2": "99.6",
-            "value": "wkkw"
+            "value": "wkkw",
+            "same": 43.4,
+            "ACC_Y_MPS2": "100"
         }"#;
-    let rr:BTreeMap<String, String> = serde_json::from_str(data).unwrap();
-    let j = json!(rr);
-    let vv: G2Data = serde_json::from_value(j).unwrap();
-    codec_writer.append_ser(vv).unwrap();
-    codec_writer.flush().unwrap();
+    // let rr:BTreeMap<String, String> = serde_json::from_str(data).unwrap();
+    // let j = json!(rr);
+    // let vv: G2Data = serde_json::from_value(j).unwrap();
+    // println!("{:?}", vv);
+    // codec_writer.append_ser(vv).unwrap();
+    // codec_writer.flush().unwrap();
 
     let now = Instant::now();
-    for n in 1..10000 {
+    // for n in 1..2 {
         let v: G2Data = serde_json::from_str(data).unwrap();
         // println!("v==={:?}", v);
         match codec_writer.append_ser(v) {
             Ok(f) => f,
             Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
         };
-    }
+    // }
     match codec_writer.flush() {
         Ok(v) => v,
         Err(e) => return Err(MyError::SerdeSerializer(e.to_string()),)
     };
-    
     let elasped = now.elapsed();
     println!("EL{:?}", elasped);
     let ec = codec_writer.into_inner();
@@ -149,6 +215,12 @@ fn tt() -> Result<Vec<u8>, MyError> {
     println!("len with compression={:?}", l_e);
     // println!("{:?}", std::any::TypeId::of::<ec>());
     // println!("{:?}", res.len());
+    let reader = Reader::with_schema(&schema, &ec[..]).unwrap();
+    println!("All good");
+
+    for record in reader {
+        println!("{:?}", from_value::<G2DataRes>(&record.unwrap()));
+    }
     Ok(ec)
 
 }
