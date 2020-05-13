@@ -216,10 +216,17 @@ fn tt() -> Result<Vec<u8>, MyError> {
     // println!("{:?}", std::any::TypeId::of::<ec>());
     // println!("{:?}", res.len());
     let reader = Reader::with_schema(&schema, &ec[..]).unwrap();
-    println!("All good");
-
+    
+    let mut vec_d: Vec<G2DataRes> = Vec::new();
     for record in reader {
-        println!("{:?}", from_value::<G2DataRes>(&record.unwrap()));
+        let mut d = match from_value::<G2DataRes>(&record.unwrap()){
+            Ok(v) => v,
+            Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
+        };
+        vec_d.push(d);
+    }
+    for v in vec_d {
+        println!("{:?}", v);
     }
     Ok(ec)
 
