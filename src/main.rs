@@ -8,8 +8,14 @@ use serde_json::Value;
 use std::fmt::Display;
 use std::str::FromStr;
 use std::time::Instant;
+use derive_more::From;
 
 use serde::de::{self, Deserializer};
+
+#[derive(Debug, From)]
+pub enum MyError{
+    SerdeSerializer(String),
+}
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -96,7 +102,7 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
 
 
 
-fn tt() -> Vec<u8> {
+fn tt() -> Result<Vec<u8>, MyError> {
     println!("Hello world");
     // can_raw
     let mut file = File::open("/home/amit/rust_samples/avr_ser/ge2.avsc").unwrap();
@@ -121,9 +127,15 @@ fn tt() -> Vec<u8> {
     for n in 1..10000 {
         let v: G2Data = serde_json::from_str(data).unwrap();
         // println!("v==={:?}", v);
-        codec_writer.append_ser(v).unwrap();
+        match codec_writer.append_ser(v) {
+            Ok(f) => f,
+            Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
+        };
     }
-    codec_writer.flush().unwrap();
+    match codec_writer.flush() {
+        Ok(v) => v,
+        Err(e) => return Err(MyError::SerdeSerializer(e.to_string()),)
+    };
     let elasped = now.elapsed();
     println!("EL{:?}", elasped);
     let ec = codec_writer.into_inner();
@@ -131,11 +143,11 @@ fn tt() -> Vec<u8> {
     println!("len with compression={:?}", l_e);
     // println!("{:?}", std::any::TypeId::of::<ec>());
     // println!("{:?}", res.len());
-    ec
+    Ok(ec)
 
 }
 
 fn main(){
-    let dd = tt();
+    let dd = tt().unwrap();
     println!("{:?}", dd.len());
 }
