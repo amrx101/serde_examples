@@ -29,7 +29,7 @@ pub struct G2Data {
     #[serde(default)]
     key: Option<String>,
     #[serde(default, deserialize_with="from_str_optional")]
-    timestamp: Option<i32>,
+    timestamp: Option<f64>,
     #[serde(default)]
     start_timestamp: Option<String>,
     #[serde(default)]
@@ -89,7 +89,7 @@ pub struct G2DataRes {
     #[serde(default)]
     key: Option<String>,
     #[serde(default)]
-    timestamp: Option<i32>,
+    timestamp: Option<f64>,
     #[serde(default)]
     start_timestamp: Option<String>,
     #[serde(default)]
@@ -184,7 +184,8 @@ fn tt() -> Result<Vec<u8>, MyError> {
             "ACC_X_MPS2": "99.6",
             "value": "wkkw",
             "ACC_Y_MPS2": "100",
-            "extra": "extra"
+            "extra": "extra",
+            "timestamp": "1589441481.885"
         }"#;
     let rr:BTreeMap<String, String> = serde_json::from_str(data).unwrap();
     let j = json!(rr);
@@ -211,21 +212,21 @@ fn tt() -> Result<Vec<u8>, MyError> {
     let ec = codec_writer.into_inner();
     let l_e = ec.len();
     println!("len with compression={:?}", l_e);
-    // println!("{:?}", std::any::TypeId::of::<ec>());
+    // println!("{:?}", std::any::TypeId::of::<Vec>());
     // println!("{:?}", res.len());
-    // let reader = Reader::with_schema(&schema, &ec[..]).unwrap();
+    let reader = Reader::with_schema(&schema, &ec[..]).unwrap();
     
-    // let mut vec_d: Vec<G2DataRes> = Vec::new();
-    // for record in reader {
-    //     let mut d = match from_value::<G2DataRes>(&record.unwrap()){
-    //         Ok(v) => v,
-    //         Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
-    //     };
-    //     vec_d.push(d);
-    // }
-    // for v in vec_d {
-    //     println!("{:?}", v);
-    // }
+    let mut vec_d: Vec<G2DataRes> = Vec::new();
+    for record in reader {
+        let mut d = match from_value::<G2DataRes>(&record.unwrap()){
+            Ok(v) => v,
+            Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
+        };
+        vec_d.push(d);
+    }
+    for v in vec_d {
+        println!("{:?}", v);
+    }
     Ok(ec)
 
 }
