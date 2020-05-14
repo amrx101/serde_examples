@@ -75,7 +75,6 @@ pub struct G2Data {
     GYR_Y_DEG: Option<f32>,
     #[serde(default, deserialize_with="from_str_optional")]
     GYR_Z_DEG: Option<f32>,
-    same: f32,
 
 }
 
@@ -136,7 +135,6 @@ pub struct G2DataRes {
     GYR_Y_DEG: Option<f32>,
     #[serde(default)]
     GYR_Z_DEG: Option<f32>,
-    same: f32,
 
 }
 
@@ -185,15 +183,14 @@ fn tt() -> Result<Vec<u8>, MyError> {
             "mender_artifact_ver": "11",
             "ACC_X_MPS2": "99.6",
             "value": "wkkw",
-            "same": 43.4,
             "ACC_Y_MPS2": "100"
         }"#;
-    // let rr:BTreeMap<String, String> = serde_json::from_str(data).unwrap();
-    // let j = json!(rr);
-    // let vv: G2Data = serde_json::from_value(j).unwrap();
-    // println!("{:?}", vv);
-    // codec_writer.append_ser(vv).unwrap();
-    // codec_writer.flush().unwrap();
+    let rr:BTreeMap<String, String> = serde_json::from_str(data).unwrap();
+    let j = json!(rr);
+    let vv: G2Data = serde_json::from_value(j).unwrap();
+    println!("{:?}", vv);
+    codec_writer.append_ser(vv).unwrap();
+    codec_writer.flush().unwrap();
 
     let now = Instant::now();
     for n in 1..10 {
