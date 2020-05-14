@@ -20,8 +20,8 @@ pub enum MyError{
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct G2Data {
-    #[serde(default, deserialize_with="from_str_optional")]
-    can_id: Option<i32>,
+    #[serde(default)]
+    can_id: Option<String>,
     #[serde(default)]
     data: Option<String>,
     #[serde(default)]
@@ -82,7 +82,7 @@ pub struct G2Data {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct G2DataRes {
     #[serde(default)]
-    can_id: Option<i32>,
+    can_id: Option<String>,
     #[serde(default)]
     data: Option<String>,
     #[serde(default)]
@@ -181,7 +181,7 @@ fn tt() -> Result<Vec<u8>, MyError> {
     let mut codec_writer = Writer::with_codec(&schema, res, Codec::Deflate);
     let data = r#"
         {
-
+            "can_id": "0x100",
             "mender_artifact_ver": "11",
             "ACC_X_MPS2": "99.6",
             "value": "wkkw",
@@ -215,19 +215,19 @@ fn tt() -> Result<Vec<u8>, MyError> {
     println!("len with compression={:?}", l_e);
     // println!("{:?}", std::any::TypeId::of::<ec>());
     // println!("{:?}", res.len());
-    let reader = Reader::with_schema(&schema, &ec[..]).unwrap();
+    // let reader = Reader::with_schema(&schema, &ec[..]).unwrap();
     
-    let mut vec_d: Vec<G2DataRes> = Vec::new();
-    for record in reader {
-        let mut d = match from_value::<G2DataRes>(&record.unwrap()){
-            Ok(v) => v,
-            Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
-        };
-        vec_d.push(d);
-    }
-    for v in vec_d {
-        println!("{:?}", v);
-    }
+    // let mut vec_d: Vec<G2DataRes> = Vec::new();
+    // for record in reader {
+    //     let mut d = match from_value::<G2DataRes>(&record.unwrap()){
+    //         Ok(v) => v,
+    //         Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
+    //     };
+    //     vec_d.push(d);
+    // }
+    // for v in vec_d {
+    //     println!("{:?}", v);
+    // }
     Ok(ec)
 
 }
