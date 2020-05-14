@@ -183,7 +183,8 @@ fn tt() -> Result<Vec<u8>, MyError> {
             "mender_artifact_ver": "11",
             "ACC_X_MPS2": "99.6",
             "value": "wkkw",
-            "ACC_Y_MPS2": "100"
+            "ACC_Y_MPS2": "100",
+            "extra": "extra"
         }"#;
     let rr:BTreeMap<String, String> = serde_json::from_str(data).unwrap();
     let j = json!(rr);
