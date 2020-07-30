@@ -146,12 +146,9 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
 {
     // println!("{:?}", deserializer);
     let deser_res: Result<Value, _> = serde::Deserialize::deserialize(deserializer);
-    println!("{:?}", deser_res);
     match deser_res {
         Ok(Value::String(s)) => T::from_str(&s).map_err(serde::de::Error::custom).map(Option::from),
         Ok(v) => {
-            println!("strssssing expected but found something else: {}", v);
-            // return Ok(Value::Number(s));
             return Ok(None);
         },
         Err(_) => Ok(None)
@@ -165,14 +162,11 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
 
 
 fn tt() -> Result<Vec<u8>, MyError> {
-    println!("Hello world");
-    // can_raw
     let mut file = File::open("/home/amit/rust_samples/avr_ser/ge2.avsc").unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     let schema = Schema::parse_str(&contents).unwrap();
     let vv = schema.canonical_form();
-    // println!("{}", vv);
 
     let mut res: Vec<u8> = Vec::new();
     
@@ -190,14 +184,12 @@ fn tt() -> Result<Vec<u8>, MyError> {
     let rr:BTreeMap<String, String> = serde_json::from_str(data).unwrap();
     let j = json!(rr);
     let vv: G2Data = serde_json::from_value(j).unwrap();
-    println!("{:?}", vv);
     codec_writer.append_ser(vv).unwrap();
     codec_writer.flush().unwrap();
 
     let now = Instant::now();
     for n in 1..10 {
         let v: G2Data = serde_json::from_str(data).unwrap();
-        // println!("v==={:?}", v);
         match codec_writer.append_ser(v) {
             Ok(f) => f,
             Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
@@ -208,14 +200,10 @@ fn tt() -> Result<Vec<u8>, MyError> {
         Err(e) => return Err(MyError::SerdeSerializer(e.to_string()),)
     };
     let elasped = now.elapsed();
-    println!("EL{:?}", elasped);
     let ec = codec_writer.into_inner();
-    let l_e = ec.len();
-    println!("len with compression={:?}", l_e);
-    // println!("{:?}", std::any::TypeId::of::<Vec>());
-    // println!("{:?}", res.len());
+   // serialization withDeflate complete.
+
     let reader = Reader::with_schema(&schema, &ec[..]).unwrap();
-    
     let mut vec_d: Vec<G2DataRes> = Vec::new();
     for record in reader {
         let mut d = match from_value::<G2DataRes>(&record.unwrap()){
@@ -232,6 +220,5 @@ fn tt() -> Result<Vec<u8>, MyError> {
 }
 
 fn main(){
-    let dd = tt().unwrap();
-    println!("{:?}", dd.len());
+    tt().unwrap();
 }
