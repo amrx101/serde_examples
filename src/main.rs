@@ -17,7 +17,11 @@ pub enum MyError{
     SerdeSerializer(String),
 }
 
+use flate2::Compression;
+use flate2::write::DeflateEncoder;
 
+
+// These are Rust 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct G2Data {
     #[serde(default)]
@@ -170,7 +174,8 @@ fn tt() -> Result<Vec<u8>, MyError> {
 
     let mut res: Vec<u8> = Vec::new();
     
-    let mut codec_writer = Writer::with_codec(&schema, res, Codec::Deflate);
+    // This is the codec writer. It consumes a schema, a place holder and a Codec.
+    let mut codec_writer = Writer::new(&schema, res);
     let data = r#"
         {
             "can_id": "0x100",
@@ -181,6 +186,23 @@ fn tt() -> Result<Vec<u8>, MyError> {
             "extra": "extra",
             "timestamp": "1589441481.885"
         }"#;
+    
+    // imu
+    let imu_data = r#"
+    {
+        "ACC_X_MPS2" : "83.4343",
+        "ACC_Y_MPS2": "133.322",
+        "ACC_Z_MPS2": "132.43322",
+        "GYR_X_DEG": "232.432",
+        "GYR_Y_DEG": "3221.221",
+        "GYR_Z_DEG: "3322.322"
+    }
+    "#;
+    // log
+    // can_parsed
+
+    
+    // next 5 lines dont bother. Basically string is converted to a Struct
     let rr:BTreeMap<String, String> = serde_json::from_str(data).unwrap();
     let j = json!(rr);
     let vv: G2Data = serde_json::from_value(j).unwrap();
@@ -188,21 +210,27 @@ fn tt() -> Result<Vec<u8>, MyError> {
     codec_writer.flush().unwrap();
 
     let now = Instant::now();
+    // create 10 records based on the string and ask codec to keep it for future.
     for n in 1..10 {
         let v: G2Data = serde_json::from_str(data).unwrap();
+        println!("v={:?}", v);
         match codec_writer.append_ser(v) {
             Ok(f) => f,
             Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
         };
     }
+    // do the serialization and compression.
     match codec_writer.flush() {
         Ok(v) => v,
         Err(e) => return Err(MyError::SerdeSerializer(e.to_string()),)
     };
     let elasped = now.elapsed();
-    let ec = codec_writer.into_inner();
-   // serialization withDeflate complete.
 
+    // serilalized bytes
+    let ec = codec_writer.into_inner();
+    println!("{:?}", ec);
+
+   // now we will attempt to deserialize the bytes.
     let reader = Reader::with_schema(&schema, &ec[..]).unwrap();
     let mut vec_d: Vec<G2DataRes> = Vec::new();
     for record in reader {
@@ -212,11 +240,19 @@ fn tt() -> Result<Vec<u8>, MyError> {
         };
         vec_d.push(d);
     }
-    for v in vec_d {
-        println!("{:?}", v);
-    }
+
+    println!("{:?}", vec_d);
+    // for v in vec_d {
+    //     println!("{:?}", v);
+    // }
     Ok(ec)
 
+}
+
+fn compress_deflate(uncompressed_buffer: &[u8]) -> Vec<u8> {
+	let mut e = DeflateEncoder::new(Vec::new(), Compression::default());
+	e.write(uncompressed_buffer).unwrap();
+	e.finish().expect("Deflate: Failed to compress data")
 }
 
 fn main(){
