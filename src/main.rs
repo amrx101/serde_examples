@@ -9,6 +9,8 @@ use std::fmt::Display;
 use std::str::FromStr;
 use std::time::Instant;
 use derive_more::From;
+use std::io::{self, prelude::*, BufReader};
+
 
 use serde::de::{self, Deserializer};
 
@@ -159,6 +161,28 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
     }
 }
 
+fn get_can_data()-> G2Data {
+    let can_data = r#"
+        {
+            "key": "BMS_Cell3",
+            "value": "3.5231",
+            "timestamp": "1589441481.885"
+        }
+    "#;
+    serde_json::from_str(can_data).unwrap()
+}
+
+fn get_imu_data() -> G2Data {
+    let imu_data = r#"{
+        "ACC_X_MPS2": "33213.322",
+        "ACC_Y_MPS2": "323.909803",
+        "ACC_Z_MPS2": "2121.443",
+        "GYR_X_DEG": "2323.111",
+        "GYR_Y_DEG": "223.11274",
+        "GYR_Z_DEG": "3434.2211"
+    }"#;
+    serde_json::from_str(imu_data).unwrap()
+}
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=use%20serde%3A%3ADeserialize%3B%0Ause%20serde_json%3A%3Ajson%3B%0Ause%20std%3A%3Acollections%3A%3ABTreeMap%3B%0A%0A%23%5Bderive(Deserialize%2C%20Debug)%5D%0Astruct%20User%20%7B%0A%20%20%20%20fingerprint%3A%20Option%3CString%3E%2C%0A%20%20%20%20location%3A%20String%2C%0A%7D%0A%0Afn%20main()%20%7B%0A%20%20%20%20let%20mut%20m%3A%20BTreeMap%3CString%2C%20String%3E%20%3D%20BTreeMap%3A%3Anew()%3B%0A%20%20%20%20m.insert(%22fingerprint%22.to_owned()%2C%20%22aa%22.to_owned())%3B%0A%20%20%20%20m.insert(%22location%22.to_owned()%2C%20%22aa%22.to_owned())%3B%0A%20%20%20%20%2F%2F%20The%20type%20of%20%60j%60%20is%20%60serde_json%3A%3AValue%60%0A%20%20%20%20let%20j%20%3D%20json!(%7B%0A%20%20%20%20%20%20%20%20%2F%2F%20%22fingerprint%22%3A%20%220xF9BA143B95FF6D82%22%2C%0A%20%20%20%20%20%20%20%20%22location%22%3A%20%22Menlo%20Park%2C%20CA%22%0A%20%20%20%20%7D)%3B%0A%20%20%20%20%0A%20%20%20%20let%20d%20%3D%20json!(m)%3B%0A%0A%20%20%20%20let%20u%3A%20User%20%3D%20serde_json%3A%3Afrom_value(j).unwrap()%3B%0A%20%20%20%20println!(%22%7B%3A%23%3F%7D%22%2C%20u)%3B%0A%20%20%20%20let%20du%3A%20User%20%3D%20serde_json%3A%3Afrom_value(d).unwrap()%3B%0A%20%20%20%20println!(%22%7B%3A%23%3F%7D%22%2C%20du)%3B%0A%7D
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=f265edc1b9e5fd4485a83da40fd01785
 
@@ -175,50 +199,19 @@ fn tt() -> Result<Vec<u8>, MyError> {
     let mut res: Vec<u8> = Vec::new();
     
     // This is the codec writer. It consumes a schema, a place holder and a Codec.
-    let mut codec_writer = Writer::new(&schema, res);
-    let data = r#"
-        {
-            "can_id": "0x100",
-            "mender_artifact_ver": "11",
-            "ACC_X_MPS2": "99.6",
-            "value": "wkkw",
-            "ACC_Y_MPS2": "100",
-            "extra": "extra",
-            "timestamp": "1589441481.885"
-        }"#;
-    
-    // imu
-    let imu_data = r#"
-    {
-        "ACC_X_MPS2" : "83.4343",
-        "ACC_Y_MPS2": "133.322",
-        "ACC_Z_MPS2": "132.43322",
-        "GYR_X_DEG": "232.432",
-        "GYR_Y_DEG": "3221.221",
-        "GYR_Z_DEG: "3322.322"
-    }
-    "#;
-    // log
-    // can_parsed
-
-    
-    // next 5 lines dont bother. Basically string is converted to a Struct
-    let rr:BTreeMap<String, String> = serde_json::from_str(data).unwrap();
-    let j = json!(rr);
-    let vv: G2Data = serde_json::from_value(j).unwrap();
-    codec_writer.append_ser(vv).unwrap();
-    codec_writer.flush().unwrap();
+    let mut codec_writer = Writer::with_codec(&schema, res, Codec::Deflate);
 
     let now = Instant::now();
     // create 10 records based on the string and ask codec to keep it for future.
     for n in 1..10 {
-        let v: G2Data = serde_json::from_str(data).unwrap();
+        let v: G2Data = get_can_data();
         println!("v={:?}", v);
         match codec_writer.append_ser(v) {
             Ok(f) => f,
             Err(e) => return Err(MyError::SerdeSerializer(e.to_string()))
         };
     }
+
     // do the serialization and compression.
     match codec_writer.flush() {
         Ok(v) => v,
@@ -242,9 +235,7 @@ fn tt() -> Result<Vec<u8>, MyError> {
     }
 
     println!("{:?}", vec_d);
-    // for v in vec_d {
-    //     println!("{:?}", v);
-    // }
+    println!("Total_items_DESERIALIZED={:?}", vec_d.len());
     Ok(ec)
 
 }
@@ -258,3 +249,5 @@ fn compress_deflate(uncompressed_buffer: &[u8]) -> Vec<u8> {
 fn main(){
     tt().unwrap();
 }
+
+
