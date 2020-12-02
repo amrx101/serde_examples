@@ -10,6 +10,8 @@ use std::str::FromStr;
 use std::time::Instant;
 use derive_more::From;
 use std::io::{self, prelude::*, BufReader};
+use rumqtt::{MqttClient, MqttOptions, QoS, ReconnectOptions};
+use std::{thread, time::Duration};
 // use avrow::{from_value as fv, Codec as cc, Reader as rr, Schema as sc, Writer as w, Record as Rr};
 
 
@@ -285,7 +287,34 @@ fn compress_deflate(uncompressed_buffer: &[u8]) -> Vec<u8> {
 }
 
 fn main(){
-    tt().unwrap();
+    // let serialized = tt().unwrap();
+    // println!("serialized_data={:?}", serialized);
+    let broker = "172.19.0.166";
+    let port = 1883;
+
+    let reconnection_options = ReconnectOptions::Always(10);
+    let mqtt_options = MqttOptions::new("test-pubsub2", broker, port)
+                                    .set_keep_alive(10)
+                                    .set_inflight(3)
+                                    .set_request_channel_capacity(3)
+                                    .set_reconnect_opts(reconnection_options)
+                                    .set_clean_session(false);
+
+    let (mut mqtt_client, notifications) = MqttClient::start(mqtt_options).unwrap();
+    mqtt_client.subscribe("/devices/digital_twin/events/v1/buffered_channel", QoS::AtLeastOnce).unwrap();
+
+    thread::spawn(move || {
+        for i in 0..100 {
+            let payload = tt().unwrap();
+            thread::sleep(Duration::from_millis(1000));
+            mqtt_client.publish("/devices/digital_twin/events/v1/buffered_channel", QoS::AtLeastOnce, false, payload).unwrap();
+        }
+    });
+
+    for notification in notifications {
+        println!("{:?}", notification)
+    }
+
 }
 
 
