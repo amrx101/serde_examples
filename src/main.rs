@@ -26,7 +26,8 @@ use flate2::Compression;
 use flate2::write::DeflateEncoder;
 
 
-// These are Rust 
+// These are RustLang specific struct of our Data. Python equivalent would be a class 
+// with these attributes.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct G2Data {
     #[serde(default)]
@@ -97,6 +98,7 @@ pub struct G2Data {
 
 }
 
+// Same comment as above.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct G2DataRes {
     #[serde(default)]
@@ -167,7 +169,7 @@ pub struct G2DataRes {
 
 }
 
-
+/// Ignore this.
 fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
     where T: FromStr,
           T::Err: Display,
@@ -184,31 +186,7 @@ fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
     }
 }
 
-fn get_can_data()-> G2Data {
-    let can_data = r#"
-        {
-            "key": "BMS_Cell3",
-            "value": "3.5231",
-            "timestamp": "1589441481.885"
-        }
-    "#;
-    serde_json::from_str(can_data).unwrap()
-}
-
-fn get_imu_data() -> G2Data {
-    let imu_data = r#"{
-        "ACC_X_MPS2": "33213.322",
-        "ACC_Y_MPS2": "323.909803",
-        "ACC_Z_MPS2": "2121.443",
-        "GYR_X_DEG": "2323.111",
-        "GYR_Y_DEG": "223.11274",
-        "GYR_Z_DEG": "3434.2211"
-    }"#;
-    serde_json::from_str(imu_data).unwrap()
-}
-// https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=use%20serde%3A%3ADeserialize%3B%0Ause%20serde_json%3A%3Ajson%3B%0Ause%20std%3A%3Acollections%3A%3ABTreeMap%3B%0A%0A%23%5Bderive(Deserialize%2C%20Debug)%5D%0Astruct%20User%20%7B%0A%20%20%20%20fingerprint%3A%20Option%3CString%3E%2C%0A%20%20%20%20location%3A%20String%2C%0A%7D%0A%0Afn%20main()%20%7B%0A%20%20%20%20let%20mut%20m%3A%20BTreeMap%3CString%2C%20String%3E%20%3D%20BTreeMap%3A%3Anew()%3B%0A%20%20%20%20m.insert(%22fingerprint%22.to_owned()%2C%20%22aa%22.to_owned())%3B%0A%20%20%20%20m.insert(%22location%22.to_owned()%2C%20%22aa%22.to_owned())%3B%0A%20%20%20%20%2F%2F%20The%20type%20of%20%60j%60%20is%20%60serde_json%3A%3AValue%60%0A%20%20%20%20let%20j%20%3D%20json!(%7B%0A%20%20%20%20%20%20%20%20%2F%2F%20%22fingerprint%22%3A%20%220xF9BA143B95FF6D82%22%2C%0A%20%20%20%20%20%20%20%20%22location%22%3A%20%22Menlo%20Park%2C%20CA%22%0A%20%20%20%20%7D)%3B%0A%20%20%20%20%0A%20%20%20%20let%20d%20%3D%20json!(m)%3B%0A%0A%20%20%20%20let%20u%3A%20User%20%3D%20serde_json%3A%3Afrom_value(j).unwrap()%3B%0A%20%20%20%20println!(%22%7B%3A%23%3F%7D%22%2C%20u)%3B%0A%20%20%20%20let%20du%3A%20User%20%3D%20serde_json%3A%3Afrom_value(d).unwrap()%3B%0A%20%20%20%20println!(%22%7B%3A%23%3F%7D%22%2C%20du)%3B%0A%7D
-// https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=f265edc1b9e5fd4485a83da40fd01785
-
+/// Sample MOT_NPres_RPM data, key, value and timestamp
 fn get_digital_twin_data()-> G2Data{
     let mot_data = r#"{
         "key": "MOT_NPres_RPM",
@@ -218,6 +196,7 @@ fn get_digital_twin_data()-> G2Data{
     serde_json::from_str(mot_data).unwrap()
 }
 
+/// Sample SOCData. key, value and timestamp.
 fn get_dt_soc_data() -> Vec<G2Data>{
     let mut res:Vec<G2Data> = Vec::new();
     let cell_1 = r#"{
@@ -237,6 +216,7 @@ fn get_dt_soc_data() -> Vec<G2Data>{
     res
 }
 
+/// Parse Apache Avro config file and create a Schema Object.
 fn get_scheme_config() -> Schema {
     let mut file = File::open("/home/amit/rust_samples/avr_ser/ge2.avsc").unwrap();
     let mut contents = String::new();
@@ -246,12 +226,10 @@ fn get_scheme_config() -> Schema {
 }
 
 
-fn tt() -> Result<Vec<u8>, MyError> {
+/// This function creates a serialized payload.
+fn get_serialized_payload() -> Result<Vec<u8>, MyError> {
     let schema = get_scheme_config();
-    let vv = schema.canonical_form();
-
     let mut res: Vec<u8> = Vec::new();
-    
     // This is the codec writer. It consumes a schema, a place holder and a Codec.
     let mut codec_writer = Writer::with_codec(&schema, res, Codec::Deflate);
 
@@ -272,7 +250,6 @@ fn tt() -> Result<Vec<u8>, MyError> {
         };
     }
 
-
     // do the serialization and compression.
     match codec_writer.flush() {
         Ok(v) => v,
@@ -285,12 +262,15 @@ fn tt() -> Result<Vec<u8>, MyError> {
     Ok(ec)
 }
 
+/// This is for reference. If one would wanna do a manual decompression.
 fn compress_deflate(uncompressed_buffer: &[u8]) -> Vec<u8> {
 	let mut e = DeflateEncoder::new(Vec::new(), Compression::default());
 	e.write(uncompressed_buffer).unwrap();
 	e.finish().expect("Deflate: Failed to compress data")
 }
 
+
+/// We will publish and recieve sample data.
 fn main(){
     let schema = get_scheme_config();
     let broker = "172.19.0.166";
@@ -307,20 +287,37 @@ fn main(){
     let (mut mqtt_client, notifications) = MqttClient::start(mqtt_options).unwrap();
     mqtt_client.subscribe("/devices/digital_twin/events/v1/buffered_channel", QoS::AtLeastOnce).unwrap();
 
+    // Publisher thread.
     thread::spawn(move || {
         loop {
-            let payload = tt().unwrap();
+            let payload = get_serialized_payload().unwrap();
             thread::sleep(Duration::from_millis(1000));
             mqtt_client.publish("/devices/digital_twin/events/v1/buffered_channel", QoS::AtLeastOnce, false, payload).unwrap();
         }
     });
 
+    // Current thread acts as client on the topic.
+    // In this thread we will take raw bytes that we receive and try to 
+    // create a Rustlang object out the bytes. Ideally one would try to do the 
+    // same for other languages.
     for notification in notifications {
-
         match notification {
             Notification::Publish(v) => {
                 let payload = v.payload;
-                println!("payload={:?}", payload);
+                // We have extracted the payload. now we will attempt to deserialize the bytes.
+                // We create a Reader with our Schema file. 
+                // Note: This lib parses the header to identify the compression algorithm and applies
+                // appropriate algo if required.
+                let reader = Reader::with_schema(&schema, &payload[..]).unwrap();   // --> This is a reader
+                // a vec to collect data.
+                let mut vec_d: Vec<G2DataRes> = Vec::new();
+
+                // our payload was a list of data, so one by one we deseriaize each one.
+                for record in reader {
+                    let mut d = from_value::<G2DataRes>(&record.unwrap()).unwrap();    // -> raw bytes to an Object 
+                    vec_d.push(d);
+                }
+                println!("Deserialized data={:?}", vec_d);
 
             },
             _ => println!("{:?}", notification),
