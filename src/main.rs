@@ -304,7 +304,7 @@ fn main(){
     mqtt_client.subscribe("/devices/digital_twin/events/v1/buffered_channel", QoS::AtLeastOnce).unwrap();
 
     thread::spawn(move || {
-        for i in 0..100 {
+        loop {
             let payload = tt().unwrap();
             thread::sleep(Duration::from_millis(1000));
             mqtt_client.publish("/devices/digital_twin/events/v1/buffered_channel", QoS::AtLeastOnce, false, payload).unwrap();
