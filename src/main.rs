@@ -10,7 +10,7 @@ use std::str::FromStr;
 use std::time::Instant;
 use derive_more::From;
 use std::io::{self, prelude::*, BufReader};
-use rumqtt::{MqttClient, MqttOptions, QoS, ReconnectOptions};
+use rumqtt::{MqttClient, MqttOptions, QoS, ReconnectOptions, Notification};
 use std::{thread, time::Duration};
 // use avrow::{from_value as fv, Codec as cc, Reader as rr, Schema as sc, Writer as w, Record as Rr};
 
@@ -237,12 +237,17 @@ fn get_dt_soc_data() -> Vec<G2Data>{
     res
 }
 
-
-fn tt() -> Result<Vec<u8>, MyError> {
+fn get_scheme_config() -> Schema {
     let mut file = File::open("/home/amit/rust_samples/avr_ser/ge2.avsc").unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     let schema = Schema::parse_str(&contents).unwrap();
+    schema
+}
+
+
+fn tt() -> Result<Vec<u8>, MyError> {
+    let schema = get_scheme_config();
     let vv = schema.canonical_form();
 
     let mut res: Vec<u8> = Vec::new();
@@ -287,8 +292,7 @@ fn compress_deflate(uncompressed_buffer: &[u8]) -> Vec<u8> {
 }
 
 fn main(){
-    // let serialized = tt().unwrap();
-    // println!("serialized_data={:?}", serialized);
+    let schema = get_scheme_config();
     let broker = "172.19.0.166";
     let port = 1883;
 
@@ -312,7 +316,15 @@ fn main(){
     });
 
     for notification in notifications {
-        println!("{:?}", notification)
+
+        match notification {
+            Notification::Publish(v) => {
+                let payload = v.payload;
+                println!("payload={:?}", payload);
+
+            },
+            _ => println!("{:?}", notification),
+        };
     }
 
 }
